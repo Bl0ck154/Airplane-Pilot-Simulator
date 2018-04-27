@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Exam_Airplane_pilot_simulator
 {
-	public delegate void DispDelegate(int speed, int altitude);
+	public delegate bool DispDelegate(int speed, int altitude);
 	class Plane
 	{
 		List<Dispatcher> dispatchers;
 		DispDelegate InfoDel;
 		int speed;
 		int speed_record = 0;
+		public bool finished = false;
 		public int Speed
 		{
 			get { return speed; }
@@ -20,7 +21,8 @@ namespace Exam_Airplane_pilot_simulator
 			{
 				if (value >= 0)
 				{
-					InfoDel(speed = value, altitude);
+					finished = InfoDel(speed = value, altitude);
+					if (finished && speed_record < 1000) finished = false;
 					speed_record = Math.Max(value, speed_record);
 				}
 			}
@@ -33,8 +35,9 @@ namespace Exam_Airplane_pilot_simulator
 			private set
 			{
 				if (value >= 0)
-				{ 
-					InfoDel(speed, altitude = value);
+				{
+					finished = InfoDel(speed, altitude = value);
+					if (finished && speed_record < 1000) finished = false;
 					altitude_record = Math.Max(value, altitude_record);
 				}
 			}
@@ -62,6 +65,13 @@ namespace Exam_Airplane_pilot_simulator
 		}
 		public void Status()
 		{
+			if(finished)
+			{
+				Output.Print();
+				Output.Print("Congratulations! You've finished!");
+				Output.Print($"Record Altitude: {altitude_record}\tRecord Speed: {speed_record}\tPenalty points: {PenaltyPoints}");
+				Output.Print();
+			}
 			Output.Print();
 			Output.Print($"Dispatchers: {dispatchers.Count}\t Altitude: {Altitude}\tSpeed: {Speed}\tPenalty points: {PenaltyPoints}");
 			Output.Print();
@@ -69,7 +79,7 @@ namespace Exam_Airplane_pilot_simulator
 			if (dispatchers.Count > 0)
 				Output.Print("2. Remove dispatcher");
 			Output.Print();
-			Output.Print("Controls: ← → ↑ ↓");
+			Output.Print("Controls: ← → ↑ ↓ (+Shift)\n");
 		}
 		public void Menu(ConsoleKeyInfo key)
 		{
@@ -80,10 +90,13 @@ namespace Exam_Airplane_pilot_simulator
 					AddDispatcher(new Dispatcher(Console.ReadLine()));
 					break;
 				case ConsoleKey.D2:
-					Output.Print("Input number of dispatcher to remove: ");
-					int num = Convert.ToInt32(Console.ReadLine()) - 1;
-					removed_points += dispatchers[num].PenaltyPoints;
-					dispatchers.RemoveAt(num);
+					if (dispatchers.Count > 0)
+					{
+						Output.Print("Input number of dispatcher to remove: ");
+						int num = Convert.ToInt32(Console.ReadLine()) - 1;
+						removed_points += dispatchers[num].PenaltyPoints;
+						dispatchers.RemoveAt(num);
+					}
 					break;
 				default:
 					Fly(key);

@@ -29,40 +29,42 @@ namespace Exam_Airplane_pilot_simulator
 			Name = name;
 			WeatherVal = rand.Next(-200, 200);
 		}
-		public void PlaneTracking(int curSpeed, int altitude)
+		public bool PlaneTracking(int curSpeed, int altitude)
 		{
 			if (curSpeed == 0 && altitude == 0 && distance > 100)
-				Output.Print("Congratulations! You've finished!");
+				return true;
 
 			if (curSpeed == 0 && altitude > 0) // недопустимо, чтобы самолет в любой момент времени имел нулевую высоту и нулевую скорость
 				throw new CrashException();
 
 			if (curSpeed < 50)
-				return;
+				return false;
 
 			distance += curSpeed;
 
 			if(curSpeed > MaxSpeed)
 			{
 				PenaltyPoints += 100;
-				Output.Print($"{Name} : The maximum speed is exceeded! A fine of 100 points!");
+				Output.Print($"\t{Name} : The maximum speed is exceeded! A fine of 100 points!");
 			}
 
 			int rec_altitude = RecommendAltitude(curSpeed);
 			int difference = Math.Max(rec_altitude - altitude, altitude - rec_altitude);
-			Output.Print($"{difference}");
+		//	Output.Print($"{difference}"); // debug
 
 			if (difference >= 300 && difference <= 600)
 				PenaltyPoints += 25;
 			else if (difference >= 600 && difference <= 1000)
 				PenaltyPoints += 50;
 			else if (difference > 1000)
-				throw new CrashException();
+				throw new CrashException("Difference between current and recommended altitude was too high");
+
+			return false;
 		}
 		int RecommendAltitude(int curSpeed)
 		{
 			int answer = 7 * curSpeed - WeatherVal;
-			Output.Print($"{Name} : Recommended flight altitude: {answer}");
+			Output.Print($"\t{Name} : Recommended flight altitude: {answer}");
 			return answer;
 		}
 	}

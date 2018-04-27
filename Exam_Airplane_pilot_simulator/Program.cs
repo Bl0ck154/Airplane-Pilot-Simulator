@@ -13,28 +13,29 @@ namespace Exam_Airplane_pilot_simulator
 			try
 			{
 				Plane plane = new Plane();
-				Dispatcher vasya = new Dispatcher("vasya");
-				plane.AddDispatcher(vasya);
-				plane.AddDispatcher(new Dispatcher("RuSiK"));
-				while (true)
+//				plane.AddDispatcher(new Dispatcher("Andrew"));
+//				plane.AddDispatcher(new Dispatcher("John"));
+				while (!plane.finished)
 				{
 					plane.Status();
 					ConsoleKeyInfo key = Console.ReadKey();
 					plane.Menu(key);
-
 				}
 			}
 			catch (CrashException e)
 			{
 				Output.Print(e.Message);
+				Output.Print("You've crashed the plane!");
 			}
 			catch (NotEnoughDispatchersException e)
 			{
 				Output.Print(e.Message);
+				Main(args);
 			}
 			catch (UnsuitableForFlightsException e)
 			{
 				Output.Print(e.Message);
+				Output.Print("You are unsuitable for flights! Goodbye!");
 			}
 		}
 	}
